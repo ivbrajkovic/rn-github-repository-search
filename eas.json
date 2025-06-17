@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "version": ">= 16.11.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "dev",
+      "prebuildCommand": "expo prebuild --clean"
+    },
+    "preview": {
+      "distribution": "internal",
+      "prebuildCommand": "expo prebuild --clean"
+    },
+    "production": {
+      "autoIncrement": true,
+      "prebuildCommand": "expo prebuild --clean"
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

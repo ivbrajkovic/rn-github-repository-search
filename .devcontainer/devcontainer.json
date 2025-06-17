@@ -1,0 +1,53 @@
+{
+  "name": "github-repository-search",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "msjsdiag.vscode-react-native",
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "dsznajder.es7-react-js-snippets",
+        "johnpapa.winteriscoming",
+        "aaron-bond.better-comments",
+        "PKief.material-icon-theme",
+        "ms-azuretools.vscode-docker",
+        "expo.vscode-expo-tools",
+        "bradgashler.htmltagwrap",
+        "christian-kohler.npm-intellisense",
+        "christian-kohler.path-intellisense",
+        "chrisdias.promptboost",
+        "theBGuy.react-native-stylesheet-cleaner",
+        "vitaliymaz.vscode-svg-previewer",
+        "Gruntfuggly.todo-tree",
+        "huibizhang.codesnap-plus",
+        "streetsidesoftware.code-spell-checker",
+        "mikestead.dotenv"
+      ]
+    }
+  },
+  "mounts": [
+    // Global pnpm store volume
+    "source=global-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume"
+  ],
+  "remoteUser": "node",
+  "postCreateCommand": "bash .devcontainer/bootstrap.sh",
+  "postStartCommand": "sudo chown -R node:node ${containerWorkspaceFolder}",
+  "forwardPorts": [8081, 19000, 19001, 19002, 19006],
+  // prettier-ignore
+  "runArgs": [
+    "--name", "github-repository-search",
+    // "--network=host"
+    "-p", "8081:8081",      // Metro
+    "-p", "19000:19000",    // Dev-server handshake
+    "-p", "19001:19001",    // Manifest / updates
+    "-p", "19002:19002",    // React-DevTools
+    "-p", "19006:19006"     // Web preview (optional)
+  ]
+}

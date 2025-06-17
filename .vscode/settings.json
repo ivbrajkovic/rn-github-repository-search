@@ -1,0 +1,24 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit",
+    "source.sortMembers": "explicit"
+  },
+  "cSpell.words": [
+    "Brajković",
+    "couldn",
+    "devcontainers",
+    "ellipsize",
+    "ivbrajkovic",
+    "magnifyingglass",
+    "Mmkv",
+    "mobileprovision",
+    "Pressable",
+    "Reactotron",
+    "Segoe",
+    "Subviews",
+    "unimodules",
+    "unistyles",
+    "unrs"
+  ]
+}
