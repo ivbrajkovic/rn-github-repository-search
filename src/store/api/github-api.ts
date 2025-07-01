@@ -56,20 +56,21 @@ export const githubApi = createApi({
   tagTypes: ['Repo'],
   endpoints: (builder) => ({
     searchRepositories: builder.query<SearchResponse, SearchRepositoriesParams>({
-      query: ({ query, page, per_page, sort, order }) => ({
-        url: '/search/repositories',
-        params: {
-          q: query,
-          page: page || DEFAULT_PAGE,
-          per_page: per_page || DEFAULT_RESULTS_PER_PAGE,
+      query: ({ query, page, per_page, sort, order }) => {
+        const q = query;
+        const otherParams = new URLSearchParams({
+          page: String(page || DEFAULT_PAGE),
+          per_page: String(per_page || DEFAULT_RESULTS_PER_PAGE),
           sort: sort || DEFAULT_SORT,
           order: order || DEFAULT_ORDER,
-        },
-        headers: {
-          // GitHub pagination headers for link information
-          Accept: 'application/vnd.github.v3+json',
-        },
-      }),
+        });
+        return {
+          url: `/search/repositories?q=${q}&${otherParams.toString()}`,
+          headers: {
+            Accept: 'application/vnd.github.v3+json',
+          },
+        };
+      },
       // Adding serializeQueryArgs to handle pagination properly
       serializeQueryArgs: ({ queryArgs }) => {
         // Only use the query for cache key, ignore pagination params
