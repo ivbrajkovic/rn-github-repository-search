@@ -114,6 +114,33 @@ export const githubApi = createApi({
       keepUnusedDataFor: 600, // Keep data for 10 minutes
       providesTags: (_result, _error, id) => [{ type: 'Repo' as const, id }],
     }),
+
+    getRepositoriesByIds: builder.query<Repository[], number[]>({
+      async queryFn(ids, _queryApi, _extraOptions, fetchWithBQ) {
+        if (ids.length === 0) {
+          return { data: [] };
+        }
+
+        // Use Promise.all to fetch all repositories concurrently.
+        const results = await Promise.all(
+          ids.map((id) => fetchWithBQ(`/repositories/${id}`))
+        );
+
+        // Check for errors in the results.
+        const failedResult = results.find((result) => result.error);
+        if (failedResult && failedResult.error) {
+          return {
+            error: failedResult.error,
+          };
+        }
+
+        // Extract the data from the results.
+        const data = results.map((result) => result.data) as Repository[];
+        return { data };
+      },
+      providesTags: (result) =>
+        result ? [...result.map(({ id }) => ({ type: 'Repo' as const, id }))] : [],
+    }),
   }),
 });
 
@@ -121,4 +148,5 @@ export const {
   useSearchRepositoriesQuery,
   useLazySearchRepositoriesQuery,
   useRepoByIdQuery,
+  useGetRepositoriesByIdsQuery,
 } = githubApi;

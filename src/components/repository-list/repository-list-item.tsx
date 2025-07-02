@@ -1,10 +1,23 @@
 import { githubApi, Repository } from '@/store/api/github-api';
-import { useAppDispatch } from '@/store/hooks';
+import { addFavorite, removeFavorite } from '@/store/favorites-slice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { formatDate } from '@/utils/format-date';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+
+const FavoriteIcon = ({ isFavorite }: { isFavorite: boolean }) => {
+  const style = useUnistyles();
+  return (
+    <Ionicons
+      name={isFavorite ? 'star' : 'star-outline'}
+      size={18}
+      color={style.rt.themeName === 'dark' ? 'yellow' : 'orange'}
+    />
+  );
+};
 
 type RepositoryListItemProps = {
   item: Repository;
@@ -14,6 +27,10 @@ export const RepositoryListItem = memo(
   ({ item }: RepositoryListItemProps) => {
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const favoriteRepositoryIds = useAppSelector(
+      (state) => state.favorites.repositoryIds
+    );
+    const isFavorite = favoriteRepositoryIds.includes(item.id);
 
     const updateTimeFormatted = formatDate(item.updated_at);
 
@@ -23,9 +40,14 @@ export const RepositoryListItem = memo(
       await dispatch(githubApi.util.upsertQueryData('repoById', item.id, item));
 
       router.push({
-        pathname: '/repository/[id]',
+        pathname: '/(tabs)/(home)/repository/[id]',
         params: { id: item.id.toString() },
       });
+    };
+
+    const handleFavoritePress = () => {
+      if (isFavorite) dispatch(removeFavorite(item.id));
+      else dispatch(addFavorite(item.id));
     };
 
     return (
@@ -44,7 +66,12 @@ export const RepositoryListItem = memo(
           <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
             {item.name}
           </Text>
-          <Text style={styles.lastUpdate}>{updateTimeFormatted}</Text>
+          <View style={styles.headerRight}>
+            <Text style={styles.lastUpdate}>{updateTimeFormatted}</Text>
+            <Pressable onPress={handleFavoritePress} testID="favorite-button">
+              <FavoriteIcon isFavorite={isFavorite} />
+            </Pressable>
+          </View>
         </View>
 
         {item.description ? (
@@ -88,6 +115,11 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+  },
   name: {
     flex: 1,
     fontSize: theme.typography.fontSizes.lg,
@@ -107,4 +139,7 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.dimmed,
     lineHeight: theme.typography.lineHeights.md,
   },
+  favoriteIcon: (isFavorite: boolean) => ({
+    color: isFavorite ? 'yellow' : 'orange',
+  }),
 }));

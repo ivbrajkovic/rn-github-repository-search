@@ -1,5 +1,6 @@
 import { reduxStorage } from '@/mmkv-store/mmkv-store-store';
 import { githubApi } from '@/store/api/github-api';
+import favoritesReducer from '@/store/favorites-slice';
 import { themeReducer } from '@/theme/theme-slice';
 import { configureStore } from '@reduxjs/toolkit';
 import {
@@ -19,10 +20,16 @@ const themePersistedReducer = persistReducer(
   themeReducer
 );
 
+const favoritesPersistedReducer = persistReducer(
+  { key: 'favorites', storage: reduxStorage },
+  favoritesReducer
+);
+
 export const store = configureStore({
   reducer: {
     [githubApi.reducerPath]: githubApi.reducer,
     theme: themePersistedReducer,
+    favorites: favoritesPersistedReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
