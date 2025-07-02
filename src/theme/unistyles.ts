@@ -7,7 +7,7 @@ import { StyleSheet } from 'react-native-unistyles';
 
 // Import mmkvStore directly, but access it conditionally in the code
 // This ensures we don't try to use it during SSR on web
-import { mmkvStore } from '@/mmkv-store/mmkv-store-store';
+import { reduxStorage } from '@/mmkv-store/mmkv-store-store';
 
 const shared = {
   utility: {
@@ -148,7 +148,7 @@ StyleSheet.configure({
         }
 
         // Now we're sure we're in browser context or native app
-        const storedTheme = mmkvStore.getString('preferredTheme');
+        const storedTheme = reduxStorage.getItem('preferredTheme');
         if (storedTheme === 'dark' || storedTheme === 'light') {
           themeToUse = storedTheme as keyof AppThemes;
           __DEV__ && console.log('Loading stored theme preference:', storedTheme);

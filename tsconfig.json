@@ -14,5 +14,6 @@
     "expo-env.d.ts",
     "expect-matchers.d.ts",
     "jest.config.js"
-  ]
+  ],
+  "files": ["./node_modules/redux-persist/types/integration/react.d.ts"]
 }
