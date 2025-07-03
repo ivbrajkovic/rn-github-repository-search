@@ -21,10 +21,11 @@ const FavoriteIcon = ({ isFavorite }: { isFavorite?: boolean }) => {
 
 type RepositoryListItemProps = {
   item: Repository;
+  toggleFavorite: (id: number, isFavorite: boolean) => void;
 };
 
 export const RepositoryListItem = memo(
-  ({ item }: RepositoryListItemProps) => {
+  ({ item, toggleFavorite }: RepositoryListItemProps) => {
     const router = useRouter();
     const dispatch = useAppDispatch();
 
@@ -44,18 +45,10 @@ export const RepositoryListItem = memo(
     const handleFavoritePress = () => {
       if (item.isFavorite) {
         dispatch(removeFavorite(item.id));
-        githubApi.util.updateQueryData('repoById', item.id, (draft) => {
-          if (draft) {
-            draft.isFavorite = false;
-          }
-        });
+        toggleFavorite(item.id, false);
       } else {
         dispatch(addFavorite(item.id));
-        githubApi.util.updateQueryData('repoById', item.id, (draft) => {
-          if (draft) {
-            draft.isFavorite = true;
-          }
-        });
+        toggleFavorite(item.id, true);
       }
     };
 

@@ -5,7 +5,8 @@ import { RepositoryList } from '@/components/repository-list/repository-list';
 import { SearchInput } from '@/components/search-input/search-input';
 import { SearchOptions } from '@/components/search-options/search-options';
 import { useSearchParams } from '@/hooks/use-search-params';
-import { Repository, useLazySearchRepositoriesQuery } from '@/store/api';
+import { githubApi, Repository, useLazySearchRepositoriesQuery } from '@/store/api';
+import { useAppDispatch } from '@/store/hooks';
 import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native-unistyles';
 
@@ -21,19 +22,11 @@ const handleFetchError = (error: any) => {
 const HomeScreen = () => {
   const router = useRouter();
   const { query, page, per_page, sort, order } = useSearchParams();
+  const dispatch = useAppDispatch();
   // const favoriteSet = useAppSelector(favoriteSetSelector);
 
   const [getRepositories, { isLoading, error, data, reset }] =
     useLazySearchRepositoriesQuery();
-
-  // const repositoriesWithFavorites = useMemo(
-  //   () =>
-  //     data?.items.map((item) => ({
-  //       ...item,
-  //       isFavorite: favoriteSet.has(item.id),
-  //     })),
-  //   [data, favoriteSet]
-  // );
 
   useEffect(() => {
     if (!query) reset();
@@ -64,6 +57,36 @@ const HomeScreen = () => {
     else router.setParams({ page: 1 });
   };
 
+  const toggleFavorite = (id: number, isFavorite: boolean) => {
+    dispatch(
+      githubApi.util.updateQueryData(
+        'searchRepositories',
+        { query, page, per_page, sort, order },
+        (draft) => {
+          const repo = draft?.items.find((item) => item.id === id);
+          if (repo) {
+            repo.isFavorite = isFavorite;
+          }
+        }
+      )
+    );
+    dispatch(
+      githubApi.util.updateQueryData('getRepositoriesByIds', [id], (draft) => {
+        const repo = draft?.find((item) => item.id === id);
+        if (repo) {
+          repo.isFavorite = isFavorite;
+        }
+      })
+    );
+    dispatch(
+      githubApi.util.updateQueryData('repoById', id, (draft) => {
+        if (draft) {
+          draft.isFavorite = isFavorite;
+        }
+      })
+    );
+  };
+
   return (
     <View style={styles.container}>
       <SearchInput />
@@ -75,6 +98,7 @@ const HomeScreen = () => {
         onRefresh={handleRefresh}
         onLoadMore={handleLoadMore}
         hasNextPage={hasNextPage}
+        toggleFavorite={toggleFavorite}
       />
     </View>
   );

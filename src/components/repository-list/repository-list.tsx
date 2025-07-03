@@ -38,6 +38,7 @@ type RepositoryListProps = {
   repositories: Repository[];
   onRefresh: () => void;
   onLoadMore?: () => void;
+  toggleFavorite: (id: number, isFavorite: boolean) => void;
 };
 
 export const RepositoryList = ({
@@ -47,12 +48,15 @@ export const RepositoryList = ({
   repositories,
   onRefresh,
   onLoadMore,
+  toggleFavorite,
 }: RepositoryListProps) => {
   const keyExtractor = useCallback((item: Repository) => item.id.toString(), []);
 
   const renderItem: ListRenderItem<Repository> = useCallback(
-    ({ item }: { item: Repository }) => <RepositoryListItem item={item} />,
-    []
+    ({ item }: { item: Repository }) => (
+      <RepositoryListItem item={item} toggleFavorite={toggleFavorite} />
+    ),
+    [toggleFavorite]
   );
 
   const getItemLayout = useCallback(
