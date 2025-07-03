@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface FavoritesState {
   repositoryIds: number[];
@@ -13,13 +13,20 @@ const favoritesSlice = createSlice({
   initialState,
   reducers: {
     addFavorite: (state, action: PayloadAction<number>) => {
-      state.repositoryIds.push(action.payload);
+      if (!state.repositoryIds.includes(action.payload))
+        state.repositoryIds.push(action.payload);
+      else console.warn(`Repository with ID ${action.payload} is already a favorite.`);
     },
     removeFavorite: (state, action: PayloadAction<number>) => {
-      state.repositoryIds = state.repositoryIds.filter(id => id !== action.payload);
+      state.repositoryIds = state.repositoryIds.filter((id) => id !== action.payload);
     },
   },
 });
 
 export const { addFavorite, removeFavorite } = favoritesSlice.actions;
-export default favoritesSlice.reducer;
+export const favoritesReducer = favoritesSlice.reducer;
+
+export const favoriteSetSelector = createSelector(
+  (state: { favorites: FavoritesState }) => state.favorites.repositoryIds,
+  (repositoryIds) => new Set(repositoryIds)
+);

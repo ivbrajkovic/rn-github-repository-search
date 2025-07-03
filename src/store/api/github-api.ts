@@ -15,6 +15,7 @@ export type Repository = {
   forks_count: number;
   language: string | null;
   html_url: string;
+  isFavorite?: boolean; // Optional for UI purposes
 };
 
 export type SearchResponse = {

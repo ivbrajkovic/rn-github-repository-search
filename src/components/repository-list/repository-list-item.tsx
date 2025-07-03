@@ -1,6 +1,6 @@
 import { githubApi, Repository } from '@/store/api/github-api';
 import { addFavorite, removeFavorite } from '@/store/favorites-slice';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAppDispatch } from '@/store/hooks';
 import { formatDate } from '@/utils/format-date';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -8,7 +8,7 @@ import { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
-const FavoriteIcon = ({ isFavorite }: { isFavorite: boolean }) => {
+const FavoriteIcon = ({ isFavorite }: { isFavorite?: boolean }) => {
   const style = useUnistyles();
   return (
     <Ionicons
@@ -27,10 +27,6 @@ export const RepositoryListItem = memo(
   ({ item }: RepositoryListItemProps) => {
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const favoriteRepositoryIds = useAppSelector(
-      (state) => state.favorites.repositoryIds
-    );
-    const isFavorite = favoriteRepositoryIds.includes(item.id);
 
     const updateTimeFormatted = formatDate(item.updated_at);
 
@@ -46,8 +42,21 @@ export const RepositoryListItem = memo(
     };
 
     const handleFavoritePress = () => {
-      if (isFavorite) dispatch(removeFavorite(item.id));
-      else dispatch(addFavorite(item.id));
+      if (item.isFavorite) {
+        dispatch(removeFavorite(item.id));
+        githubApi.util.updateQueryData('repoById', item.id, (draft) => {
+          if (draft) {
+            draft.isFavorite = false;
+          }
+        });
+      } else {
+        dispatch(addFavorite(item.id));
+        githubApi.util.updateQueryData('repoById', item.id, (draft) => {
+          if (draft) {
+            draft.isFavorite = true;
+          }
+        });
+      }
     };
 
     return (
@@ -69,7 +78,7 @@ export const RepositoryListItem = memo(
           <View style={styles.headerRight}>
             <Text style={styles.lastUpdate}>{updateTimeFormatted}</Text>
             <Pressable onPress={handleFavoritePress} testID="favorite-button">
-              <FavoriteIcon isFavorite={isFavorite} />
+              <FavoriteIcon isFavorite={item.isFavorite} />
             </Pressable>
           </View>
         </View>
@@ -86,7 +95,8 @@ export const RepositoryListItem = memo(
     prevProps.item.id === nextProps.item.id &&
     prevProps.item.name === nextProps.item.name &&
     prevProps.item.description === nextProps.item.description &&
-    prevProps.item.updated_at === nextProps.item.updated_at
+    prevProps.item.updated_at === nextProps.item.updated_at &&
+    prevProps.item.isFavorite === nextProps.item.isFavorite
 );
 
 RepositoryListItem.displayName = 'RepositoryListItem';

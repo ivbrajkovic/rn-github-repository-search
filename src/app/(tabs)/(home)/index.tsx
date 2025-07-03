@@ -9,7 +9,7 @@ import { Repository, useLazySearchRepositoriesQuery } from '@/store/api';
 import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native-unistyles';
 
-const emptyArray: Repository[] = [];
+const emptyArray: (Repository & { isFavorite: boolean })[] = [];
 
 const handleFetchError = (error: any) => {
   Platform.OS === 'web'
@@ -21,9 +21,19 @@ const handleFetchError = (error: any) => {
 const HomeScreen = () => {
   const router = useRouter();
   const { query, page, per_page, sort, order } = useSearchParams();
+  // const favoriteSet = useAppSelector(favoriteSetSelector);
 
   const [getRepositories, { isLoading, error, data, reset }] =
     useLazySearchRepositoriesQuery();
+
+  // const repositoriesWithFavorites = useMemo(
+  //   () =>
+  //     data?.items.map((item) => ({
+  //       ...item,
+  //       isFavorite: favoriteSet.has(item.id),
+  //     })),
+  //   [data, favoriteSet]
+  // );
 
   useEffect(() => {
     if (!query) reset();
@@ -61,7 +71,7 @@ const HomeScreen = () => {
       <RepositoryList
         isLoading={isLoading}
         searchQuery={query}
-        repositories={data?.items || emptyArray}
+        repositories={data?.items ?? emptyArray}
         onRefresh={handleRefresh}
         onLoadMore={handleLoadMore}
         hasNextPage={hasNextPage}

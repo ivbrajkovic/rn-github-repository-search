@@ -1,6 +1,6 @@
 import { reduxStorage } from '@/mmkv-store/mmkv-store-store';
 import { githubApi } from '@/store/api/github-api';
-import favoritesReducer from '@/store/favorites-slice';
+import { favoritesReducer } from '@/store/favorites-slice';
 import { themeReducer } from '@/theme/theme-slice';
 import { configureStore } from '@reduxjs/toolkit';
 import {
