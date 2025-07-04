@@ -1,3 +1,3 @@
-import { Repository } from '@/store/api';
+import { Repository } from '@/store/api/github-api-types';
 
 export type RepositoryWithFavorite = Repository & { isFavorite: boolean };

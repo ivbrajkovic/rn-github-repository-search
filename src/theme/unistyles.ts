@@ -148,7 +148,7 @@ StyleSheet.configure({
         }
 
         // Now we're sure we're in browser context or native app
-        const storedTheme = reduxStorage.getItem('preferredTheme');
+        const storedTheme = reduxStorage.getItemSync('preferredTheme');
         if (storedTheme === 'dark' || storedTheme === 'light') {
           themeToUse = storedTheme as keyof AppThemes;
           __DEV__ && console.log('Loading stored theme preference:', storedTheme);

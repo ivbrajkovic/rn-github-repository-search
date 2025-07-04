@@ -1,28 +1,37 @@
 import { MMKV } from 'react-native-mmkv';
-import { Storage } from 'redux-persist';
+import { WebStorage } from 'redux-persist';
 
 const storage = new MMKV();
 
-export const reduxStorage: Storage = {
+export const reduxStorage = {
   setItem: (key, value) => {
-    if (typeof window !== 'undefined') {
-      storage.set(key, value);
-      return Promise.resolve(true);
+    if (typeof window === 'undefined') {
+      return Promise.resolve();
     }
-    return Promise.resolve(false);
+    storage.set(key, value);
+    return Promise.resolve();
   },
   getItem: (key) => {
     if (typeof window === 'undefined') {
       return Promise.resolve(null);
     }
     const value = storage.getString(key);
-    return Promise.resolve(value);
+    return Promise.resolve(value ?? null);
   },
   removeItem: (key) => {
     if (typeof window === 'undefined') {
-      return Promise.resolve(false);
+      return Promise.resolve();
     }
     storage.delete(key);
-    return Promise.resolve(true);
+    return Promise.resolve();
   },
+  getItemSync: (key) => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    const value = storage.getString(key);
+    return value ?? null;
+  },
+} satisfies WebStorage & {
+  getItemSync: (key: string) => string | null;
 };
