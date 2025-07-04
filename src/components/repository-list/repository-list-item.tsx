@@ -135,7 +135,4 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.dimmed,
     lineHeight: theme.typography.lineHeights.md,
   },
-  favoriteIcon: (isFavorite: boolean) => ({
-    color: isFavorite ? 'yellow' : 'orange',
-  }),
 }));
