@@ -5,7 +5,8 @@ import {
   PADDING_TOP,
 } from '@/components/repository-list/constants';
 import { RepositoryListItem } from '@/components/repository-list/repository-list-item';
-import { Repository } from '@/store/api';
+import { useFavorites } from '@/hooks/use-favorites';
+import { Repository } from '@/store/api/github-api-types';
 import { Ionicons } from '@expo/vector-icons';
 import { ComponentProps, useCallback } from 'react';
 import {
@@ -38,7 +39,6 @@ type RepositoryListProps = {
   repositories: Repository[];
   onRefresh: () => void;
   onLoadMore?: () => void;
-  toggleFavorite: (id: number, isFavorite: boolean) => void;
 };
 
 export const RepositoryList = ({
@@ -48,8 +48,8 @@ export const RepositoryList = ({
   repositories,
   onRefresh,
   onLoadMore,
-  toggleFavorite,
 }: RepositoryListProps) => {
+  const { toggleFavorite } = useFavorites();
   const keyExtractor = useCallback((item: Repository) => item.id.toString(), []);
 
   const renderItem: ListRenderItem<Repository> = useCallback(

@@ -1,4 +1,4 @@
-import { SearchRepositoriesParams } from '@/store/api/github-api';
+import { SearchRepositoriesParams } from '@/store/api/github-api-types';
 import { useLocalSearchParams } from 'expo-router';
 
 type ExtractSearchParamsReturnType = Required<SearchRepositoriesParams>;

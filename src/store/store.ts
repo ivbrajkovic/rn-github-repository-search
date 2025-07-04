@@ -8,7 +8,6 @@ import {
   PAUSE,
   PERSIST,
   PURGE,
-  PersistState,
   REGISTER,
   REHYDRATE,
   persistReducer,
@@ -41,6 +40,3 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
-
-export type RootState = ReturnType<typeof store.getState> & { _persist?: PersistState };
-export type AppDispatch = typeof store.dispatch;

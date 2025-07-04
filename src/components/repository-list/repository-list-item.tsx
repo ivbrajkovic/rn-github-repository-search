@@ -1,5 +1,5 @@
-import { githubApi, Repository } from '@/store/api/github-api';
-import { addFavorite, removeFavorite } from '@/store/favorites-slice';
+import { githubApi } from '@/store/api/github-api';
+import { Repository } from '@/store/api/github-api-types';
 import { useAppDispatch } from '@/store/hooks';
 import { formatDate } from '@/utils/format-date';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +21,7 @@ const FavoriteIcon = ({ isFavorite }: { isFavorite?: boolean }) => {
 
 type RepositoryListItemProps = {
   item: Repository;
-  toggleFavorite: (id: number, isFavorite: boolean) => void;
+  toggleFavorite: (id: number) => void;
 };
 
 export const RepositoryListItem = memo(
@@ -31,10 +31,9 @@ export const RepositoryListItem = memo(
 
     const updateTimeFormatted = formatDate(item.updated_at);
 
-    const handlePress = async () => {
-      // Optimistically update the cache with the repository data,
-      // to ensure that the repository details are available immediately
-      await dispatch(githubApi.util.upsertQueryData('repoById', item.id, item));
+    const handlePress = () => {
+      // Update the cache directly before navigation to prevent fetch if data is already available
+      dispatch(githubApi.util.upsertQueryData('repoById', item.id, item));
 
       router.push({
         pathname: '/(tabs)/(home)/repository/[id]',
@@ -43,13 +42,7 @@ export const RepositoryListItem = memo(
     };
 
     const handleFavoritePress = () => {
-      if (item.isFavorite) {
-        dispatch(removeFavorite(item.id));
-        toggleFavorite(item.id, false);
-      } else {
-        dispatch(addFavorite(item.id));
-        toggleFavorite(item.id, true);
-      }
+      toggleFavorite(item.id);
     };
 
     return (

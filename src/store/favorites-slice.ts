@@ -1,4 +1,4 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface FavoritesState {
   repositoryIds: number[];
@@ -25,8 +25,3 @@ const favoritesSlice = createSlice({
 
 export const { addFavorite, removeFavorite } = favoritesSlice.actions;
 export const favoritesReducer = favoritesSlice.reducer;
-
-export const favoriteSetSelector = createSelector(
-  (state: { favorites: FavoritesState }) => state.favorites.repositoryIds,
-  (repositoryIds) => new Set(repositoryIds)
-);
