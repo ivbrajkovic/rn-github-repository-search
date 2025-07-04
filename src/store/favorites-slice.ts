@@ -15,7 +15,6 @@ const favoritesSlice = createSlice({
     addFavorite: (state, action: PayloadAction<number>) => {
       if (!state.repositoryIds.includes(action.payload))
         state.repositoryIds.push(action.payload);
-      else console.warn(`Repository with ID ${action.payload} is already a favorite.`);
     },
     removeFavorite: (state, action: PayloadAction<number>) => {
       state.repositoryIds = state.repositoryIds.filter((id) => id !== action.payload);
