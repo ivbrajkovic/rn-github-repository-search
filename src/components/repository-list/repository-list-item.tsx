@@ -47,9 +47,9 @@ export const RepositoryListItem = memo(
 
     return (
       <Pressable
+        testID="repository-item-touchable"
         style={styles.container}
         onPress={handlePress}
-        testID="repository-item-touchable"
         accessible={true}
         accessibilityRole="button"
         accessibilityLabel={`Repository ${item.name}, ${
