@@ -127,42 +127,43 @@ declare module 'react-native-unistyles' {
   export interface UnistylesBreakpoints extends ThemeBreakpoints {}
 }
 
-// Default theme to use when storage isn't available or there's an error
-const defaultTheme: keyof AppThemes = 'light';
+const getInitialTheme = (defaultTheme: keyof AppThemes) => {
+  const isServerSide = typeof window === 'undefined';
+  if (isServerSide) return defaultTheme;
+
+  const getThemeFromStorage = () => {
+    const persistedTheme = reduxStorage.getItemSync(`persist:theme`);
+    if (!persistedTheme) throw new Error('No theme found in mmkvStore');
+
+    const persistedThemeParsed = JSON.parse(persistedTheme) as {
+      theme?: keyof AppThemes;
+    };
+    if (!persistedThemeParsed?.theme)
+      throw new Error('No theme found in parsed mmkvStore data');
+
+    const parsedTheme = JSON.parse(persistedThemeParsed.theme) as keyof AppThemes;
+    return parsedTheme;
+  };
+
+  try {
+    const theme = getThemeFromStorage();
+    if (!theme) return defaultTheme;
+    if (!Object.keys(themes).includes(theme)) return defaultTheme;
+    return theme;
+  } catch (error) {
+    __DEV__ &&
+      console.warn(
+        `Failed to load theme preference from mmkvStore, using default ${defaultTheme} theme`,
+        error
+      );
+    return defaultTheme;
+  }
+};
 
 // Configure the StyleSheet with proper platform handling
 StyleSheet.configure({
   settings: {
-    // Use a function for both platforms, but handle them differently
-    initialTheme: () => {
-      // For safety, always have a default
-      let themeToUse: keyof AppThemes = defaultTheme;
-
-      try {
-        // Check if we're in a server-side context or browser
-        const isServerSide = typeof window === 'undefined';
-
-        // Skip storage access during server-side rendering
-        if (isServerSide) {
-          return defaultTheme;
-        }
-
-        // Now we're sure we're in browser context or native app
-        const storedTheme = reduxStorage.getItemSync('preferredTheme');
-        if (storedTheme === 'dark' || storedTheme === 'light') {
-          themeToUse = storedTheme as keyof AppThemes;
-          __DEV__ && console.log('Loading stored theme preference:', storedTheme);
-        }
-      } catch (error) {
-        __DEV__ &&
-          console.warn(
-            'Failed to load theme preference from mmkvStore, using default light theme',
-            error
-          );
-      }
-
-      return themeToUse;
-    },
+    initialTheme: () => getInitialTheme('light'),
   },
   breakpoints: getThemeBreakpoints(),
   themes: themes,

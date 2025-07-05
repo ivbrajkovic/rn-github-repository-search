@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { MMKV } from 'react-native-mmkv';
 import { WebStorage } from 'redux-persist';
 
-const storage = new MMKV();
+export const storage = new MMKV();
 const isServerSide = Platform.OS === 'web' && typeof window === 'undefined';
 
 export const reduxStorage = {
