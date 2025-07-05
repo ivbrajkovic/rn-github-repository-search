@@ -1,38 +1,55 @@
-import { githubApi, Repository } from '@/store/api/github-api';
+import { githubApi } from '@/store/api/github-api';
+import { Repository } from '@/store/api/github-api-types';
 import { useAppDispatch } from '@/store/hooks';
 import { formatDate } from '@/utils/format-date';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { memo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+
+const FavoriteIcon = ({ isFavorite }: { isFavorite?: boolean }) => {
+  const style = useUnistyles();
+  return (
+    <Ionicons
+      name={isFavorite ? 'star' : 'star-outline'}
+      size={18}
+      color={style.rt.themeName === 'dark' ? 'yellow' : 'orange'}
+    />
+  );
+};
 
 type RepositoryListItemProps = {
   item: Repository;
+  toggleFavorite: (id: number) => void;
 };
 
 export const RepositoryListItem = memo(
-  ({ item }: RepositoryListItemProps) => {
+  ({ item, toggleFavorite }: RepositoryListItemProps) => {
     const router = useRouter();
     const dispatch = useAppDispatch();
 
     const updateTimeFormatted = formatDate(item.updated_at);
 
-    const handlePress = async () => {
-      // Optimistically update the cache with the repository data,
-      // to ensure that the repository details are available immediately
-      await dispatch(githubApi.util.upsertQueryData('repoById', item.id, item));
+    const handlePress = () => {
+      // Update the cache directly before navigation to prevent fetch if data is already available
+      dispatch(githubApi.util.upsertQueryData('repoById', item.id, item));
 
       router.push({
-        pathname: '/repository/[id]',
+        pathname: '/(tabs)/(home)/repository/[id]',
         params: { id: item.id.toString() },
       });
     };
 
+    const handleFavoritePress = () => {
+      toggleFavorite(item.id);
+    };
+
     return (
       <Pressable
+        testID="repository-item-touchable"
         style={styles.container}
         onPress={handlePress}
-        testID="repository-item-touchable"
         accessible={true}
         accessibilityRole="button"
         accessibilityLabel={`Repository ${item.name}, ${
@@ -44,7 +61,12 @@ export const RepositoryListItem = memo(
           <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
             {item.name}
           </Text>
-          <Text style={styles.lastUpdate}>{updateTimeFormatted}</Text>
+          <View style={styles.headerRight}>
+            <Text style={styles.lastUpdate}>{updateTimeFormatted}</Text>
+            <Pressable onPress={handleFavoritePress} testID="favorite-button">
+              <FavoriteIcon isFavorite={item.isFavorite} />
+            </Pressable>
+          </View>
         </View>
 
         {item.description ? (
@@ -59,7 +81,8 @@ export const RepositoryListItem = memo(
     prevProps.item.id === nextProps.item.id &&
     prevProps.item.name === nextProps.item.name &&
     prevProps.item.description === nextProps.item.description &&
-    prevProps.item.updated_at === nextProps.item.updated_at
+    prevProps.item.updated_at === nextProps.item.updated_at &&
+    prevProps.item.isFavorite === nextProps.item.isFavorite
 );
 
 RepositoryListItem.displayName = 'RepositoryListItem';
@@ -87,6 +110,11 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
     alignItems: 'flex-start',
     justifyContent: 'space-between',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
   },
   name: {
     flex: 1,

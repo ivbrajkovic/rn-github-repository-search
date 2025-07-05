@@ -3,8 +3,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 
 import { ErrorBoundary } from '@/components/error-boundary/error-boundary';
-import { UniStack } from '@/components/uni-stack/uni-stack';
 import { StoreProvider } from '@/store/store-provider';
+import { ThemeProvider } from '@/theme/theme-provider';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 
@@ -25,14 +25,10 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <StoreProvider>
-        <UniStack>
-          <Stack.Screen name="index" options={{ title: 'GitHub Repository Search' }} />
-          <Stack.Screen
-            name="repository/[id]"
-            options={{ title: 'Repository Details' }}
-          />
-        </UniStack>
-        <StatusBar style="auto" />
+        <ThemeProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+          <StatusBar style="auto" />
+        </ThemeProvider>
       </StoreProvider>
     </ErrorBoundary>
   );

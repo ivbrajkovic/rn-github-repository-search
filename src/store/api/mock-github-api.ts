@@ -1,5 +1,6 @@
+import { SearchRepositoriesParams, SearchResponse } from '@/store/api/github-api-types';
 import { generateMockSearchResponse } from '../../mocks/repositories';
-import { githubApi, SearchRepositoriesParams, SearchResponse } from './github-api';
+import { githubApi } from './github-api';
 
 // Create a mock API extension
 export const mockGithubApi = githubApi.injectEndpoints({

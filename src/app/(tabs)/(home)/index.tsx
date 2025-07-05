@@ -5,11 +5,12 @@ import { RepositoryList } from '@/components/repository-list/repository-list';
 import { SearchInput } from '@/components/search-input/search-input';
 import { SearchOptions } from '@/components/search-options/search-options';
 import { useSearchParams } from '@/hooks/use-search-params';
-import { Repository, useLazySearchRepositoriesQuery } from '@/store/api';
+import { useLazySearchRepositoriesQuery } from '@/store/api/github-api';
+import { Repository } from '@/store/api/github-api-types';
 import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native-unistyles';
 
-const emptyArray: Repository[] = [];
+const emptyArray: (Repository & { isFavorite: boolean })[] = [];
 
 const handleFetchError = (error: any) => {
   Platform.OS === 'web'
@@ -61,7 +62,7 @@ const HomeScreen = () => {
       <RepositoryList
         isLoading={isLoading}
         searchQuery={query}
-        repositories={data?.items || emptyArray}
+        repositories={data?.items ?? emptyArray}
         onRefresh={handleRefresh}
         onLoadMore={handleLoadMore}
         hasNextPage={hasNextPage}

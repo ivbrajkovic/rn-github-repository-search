@@ -1,7 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ComponentProps, PropsWithChildren } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+
+type ButtonIconProps = ComponentProps<typeof Ionicons> & {
+  isSelected?: boolean;
+};
+
+const ButtonIcon = (props: ButtonIconProps) => {
+  const style = useUnistyles();
+  return (
+    <Ionicons
+      {...props}
+      size={14}
+      color={props.isSelected ? style.theme.colors.white : style.theme.colors.primary}
+    />
+  );
+};
 
 type SearchOptionsButtonProps = PropsWithChildren<{
   isSelected?: boolean;
@@ -17,7 +32,7 @@ export const SearchOptionsButton = ({
   return (
     <Pressable onPress={other.onPress}>
       <View style={styles.button(isSelected)}>
-        <Ionicons name={other.icon} size={14} style={styles.icon(isSelected)} />
+        <ButtonIcon isSelected={isSelected} name={other.icon} size={14} />
         <Text style={styles.text(isSelected)}>{other.label}</Text>
       </View>
     </Pressable>
@@ -54,9 +69,6 @@ const styles = StyleSheet.create((theme) => ({
     // borderWidth: 1,
     backgroundColor: isSelected ? theme.colors.primary : theme.colors.cardBackground,
     borderColor: isSelected ? theme.colors.primary : theme.colors.textSecondary,
-  }),
-  icon: (isSelected: boolean) => ({
-    color: isSelected ? theme.colors.white : theme.colors.primary,
   }),
   text: (isSelected: boolean) => ({
     color: isSelected ? theme.colors.white : theme.colors.text,

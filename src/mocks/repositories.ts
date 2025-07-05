@@ -1,4 +1,4 @@
-import { Repository, SearchResponse } from '../store/api/github-api';
+import { Repository, SearchResponse } from '@/store/api/github-api-types';
 
 // Mock repository data
 export const mockRepositories: Repository[] = [
